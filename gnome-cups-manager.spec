@@ -36,7 +36,6 @@ Patch18: ui_edit_name_description.patch
 Patch19: ui_serial_port.diff
 Patch20: ui_startbox.diff
 Patch21: ui_tooltip.diff
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: libgnomeui2-devel
 BuildRequires: libglade2.0-devel
 BuildRequires: libgnomecups-devel >= %{libgnomecups_version}
