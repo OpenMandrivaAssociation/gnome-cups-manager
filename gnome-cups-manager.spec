@@ -8,8 +8,8 @@
 Summary: %{longtitle}
 Name: gnome-cups-manager
 Version: 0.31
-Release: %mkrel 4
-License: GPL
+Release: %mkrel 5
+License: GPLv2+
 Group: Graphical desktop/GNOME
 URL: http://www.ximian.com
 Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
