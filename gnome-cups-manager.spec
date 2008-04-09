@@ -7,35 +7,24 @@
 
 Summary: %{longtitle}
 Name: gnome-cups-manager
-Version: 0.31
-Release: %mkrel 5
+Version: 0.33
+Release: %mkrel 1
 License: GPLv2+
 Group: Graphical desktop/GNOME
 URL: http://www.ximian.com
 Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
-#gw Ubuntu patches:
-Patch: http://archive.ubuntu.com/ubuntu/pool/universe/g/gnome-cups-manager/gnome-cups-manager_0.31-3ubuntu5.diff.gz
 Patch1: 20_change-su-command.patch
 Patch2: 23_options.patch
 Patch3: 24_printer_properties_name_entry.patch
 Patch4: 25_properties_on_add.patch
 Patch5: 26_remove-no-cups-dialog.diff
 Patch6: 27_dont-request-additional-attributes.patch
-Patch7: 30_show_also_detected_network_uris.patch
 Patch8: 35_show_more_info_of_detected_printers.patch
 Patch9: 37_transparent_notification_icon.patch
 Patch10: 40_better_menu_text_for_tcp_socket_jetdirect_printers.patch
 Patch11: 45_printer_driver_entry_cleanup.patch
-Patch12: change_uri_fix.patch
 Patch13: desktop-potfiles.patch
-Patch14: password_field_garbage.patch
-Patch15: select_eintr_crash.patch
-Patch16: translations.patch
 Patch17: ui_browse_share_ctl.patch
-Patch18: ui_edit_name_description.patch
-Patch19: ui_serial_port.diff
-Patch20: ui_startbox.diff
-Patch21: ui_tooltip.diff
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: libgnomeui2-devel
 BuildRequires: libglade2.0-devel
@@ -70,28 +59,18 @@ GNOME library for CUPS integration
 
 %prep
 %setup -q
-%patch -p1 
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p0
 %patch5 -p0
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
-%patch12 -p0
+%patch11 -p1 -b .cleanup
 %patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
 %patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p0
-%patch21 -p1
 
 %build
 
@@ -102,8 +81,6 @@ GNOME library for CUPS integration
 rm -rf $RPM_BUILD_ROOT
 
 %makeinstall_std
-install -d %buildroot%_datadir/applications
-cp debian/*.desktop %buildroot%_datadir/applications
 %find_lang %{name}
 
 %clean
