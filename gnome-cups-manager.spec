@@ -25,6 +25,7 @@ Patch10: 40_better_menu_text_for_tcp_socket_jetdirect_printers.patch
 Patch11: 45_printer_driver_entry_cleanup.patch
 Patch13: desktop-potfiles.patch
 Patch17: ui_browse_share_ctl.patch
+Patch18: gnome-cups-manager-0.33-fix-str-fmt.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: libgnomeui2-devel
 BuildRequires: libglade2.0-devel
@@ -71,6 +72,7 @@ GNOME library for CUPS integration
 %patch11 -p1 -b .cleanup
 %patch13 -p1
 %patch17 -p1
+%patch18 -p0
 
 %build
 
