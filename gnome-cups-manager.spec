@@ -8,7 +8,7 @@
 Summary: %{longtitle}
 Name: gnome-cups-manager
 Version: 0.33
-Release: %mkrel 3
+Release: %mkrel 4
 License: GPLv2+
 Group: Graphical desktop/GNOME
 URL: http://www.ximian.com
