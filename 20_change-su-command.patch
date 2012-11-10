@@ -1,0 +1,39 @@
+diff -p -up gnome-cups-manager-0.33/libgnomecups/gnome-cups-permission.c~ gnome-cups-manager-0.33/libgnomecups/gnome-cups-permission.c
+--- gnome-cups-manager-0.33/libgnomecups/gnome-cups-permission.c~	2008-04-02 09:31:24.000000000 +0200
++++ gnome-cups-manager-0.33/libgnomecups/gnome-cups-permission.c	2008-04-02 09:50:51.000000000 +0200
+@@ -76,7 +76,7 @@ gnome_cups_spawn (char const *app, int a
+ 		  gboolean force_admin, GtkWidget *toplevel)
+ {
+ 	static char const *su_app[] = {
+-		"gnomesu",
++		"gksu",
+ 		"--"
+ 	};
+ 	char const **args = g_new0 (char const *, argc + G_N_ELEMENTS (su_app) +
+@@ -84,13 +84,21 @@ gnome_cups_spawn (char const *app, int a
+ 	unsigned offset, i = 0;
+ 	GError *err = NULL;
+ 
+-	if (force_admin && !gnome_cups_can_admin ())
++	if (force_admin && !gnome_cups_can_admin ()) {
+ 		for (i = 0 ; i < G_N_ELEMENTS (su_app) ; i++)
+ 			args [i] = (char *)su_app [i];
+-	offset = i;
+-	app = args [offset++] = gnome_cups_execname (app);
+-	for (i = 0 ; i < argc ; i++)
+-		args [i + offset] = argv [i];
++ 		offset = i;
++ 		app = gnome_cups_execname (app);
++ 		for (i = 0 ; i < argc ; i++)
++ 			app = (char *)g_strjoin((gchar *)" ", (gchar *)app, (gchar *)argv [i], NULL);
++ 		args [offset++] = app;
++ 	}
++ 	else {
++ 		offset = i;
++ 		app = args [offset++] = gnome_cups_execname (app);
++ 		for (i = 0 ; i < argc ; i++)
++ 			args [i + offset] = argv [i];
++ 	}
+ 	
+ 	g_spawn_async (NULL, (char **)args, NULL, G_SPAWN_SEARCH_PATH,
+ 		       NULL, NULL, NULL, &err);

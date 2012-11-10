@@ -1,0 +1,162 @@
+diff -p -up gnome-cups-manager-0.33/libgnomecups/gnome-cups-ui-driver.c.cleanup gnome-cups-manager-0.33/libgnomecups/gnome-cups-ui-driver.c
+--- gnome-cups-manager-0.33/libgnomecups/gnome-cups-ui-driver.c.cleanup	2008-04-02 09:55:27.000000000 +0200
++++ gnome-cups-manager-0.33/libgnomecups/gnome-cups-ui-driver.c	2008-04-02 09:55:35.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include <stdlib.h>
+ 
++#define _GNU_SOURCE
+ #include "gnome-cups-ui-driver.h"
+ #include "gnome-cups-ui-util.h"
+ #include <libgnomecups/gnome-cups-request.h>
+@@ -271,6 +272,7 @@ ppd_extract_model_and_driver (GCupsPPD *
+ 
+ 	if (alias_to_vendor_map == NULL) {
+ 		static char const *apple[] = { "APPLE", NULL };
++		static char const *c_itoh[] = { "CItoh", NULL };
+ 		static char const *epson[] = { "EPSON", NULL };
+ 		static char const *okidata[] = { "OKI DATA CORP", "OKI", "OKIDATA", NULL };
+ 		static char const *minolta[] = { "MINOLTA-QMS", "MINOLTA QMS", "MINOLTA", NULL };
+@@ -312,7 +314,7 @@ ppd_extract_model_and_driver (GCupsPPD *
+ 	 * 	<model> Foomatic/gimp-print-ijs */
+ 	if (NULL != (tmp = strstr (without_vendor, " Foomatic/gimp-print-ijs"))) {
+ 		model = g_strndup (without_vendor, tmp - without_vendor);
+-		driver = g_strdup (_("High Quality Image (GIMP-Print Inkjet)"));
++		driver = g_strdup (_("High Quality Image (GIMP-Print IJS)"));
+ 	}
+ 
+ 	/* gimp-print and ijs models (suse, debian)
+@@ -322,6 +324,54 @@ ppd_extract_model_and_driver (GCupsPPD *
+ 		driver = g_strdup (_("High Quality Image (GIMP-Print)"));
+ 	}
+ 
++	/* gutenprint ijs models (suse, debian)
++	 * 	<model> Foomatic/gutenprint-ijs */
++	if (NULL != (tmp = strstr (without_vendor, " Foomatic/gutenprint-ijs-simplified"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (_("High Quality Image (Gutenprint IJS, Simplified)"));
++	}
++
++	/* gutenprint ijs models (suse, debian)
++	 * 	<model> Foomatic/gutenprint-ijs */
++	else if (NULL != (tmp = strstr (without_vendor, " Foomatic/gutenprint-ijs"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (_("High Quality Image (Gutenprint IJS)"));
++	}
++
++	/* gutenprint and ijs models (suse, debian)
++	 * 	<model> Foomatic/gutenprint */
++	else if (NULL != (tmp = strstr (without_vendor, " Foomatic/gutenprint"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (_("High Quality Image (Gutenprint)"));
++	}
++
++        /* Manufacturer-supplied PPDs
++	 * 	<model> PostScript (PS, PXL, ...) */
++	else if (NULL != (tmp = strcasestr (without_vendor, " - PostScript"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 3);
++	}
++	else if (NULL != (tmp = strcasestr (without_vendor, " PostScript"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 1);
++	}
++	else if (NULL != (tmp = strstr (without_vendor, " PS"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 1);
++	}
++	else if (NULL != (tmp = strstr (without_vendor, " PXL"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 1);
++	}
++	else if (NULL != (tmp = strcasestr (without_vendor, " BR-Script"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 1);
++	}
++	else if (NULL != (tmp = strcasestr (without_vendor, " (KPDL)"))) {
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		driver = g_strdup (tmp + 1);
++	}
++
+         /* Stock foomatic entries (suse, debian)
+ 	 * 	<model> Foomatic/<driver> */
+ 	else if (NULL != (tmp = strstr (without_vendor, " Foomatic/"))) {
+@@ -339,15 +389,49 @@ ppd_extract_model_and_driver (GCupsPPD *
+          * The filename may have a subdirectory--treat the subdir as a language, and set
+          * the driver string accordingly. Use the regular driver string for the "C" language. */
+ 	} else if (NULL != (tmp = strstr (without_vendor, " - CUPS+Gimp-Print v"))) {
++		char *ppd_filename = g_strdup(ppd->filename);
++		char *basename = strrchr (ppd_filename, '/');
++		if (basename)
++			*basename++ = '\0';
++		language = strrchr (ppd_filename, '/');
++		if (language)
++			*language++ = '\0';
++		
++		//printf("FILENAME: %s | %s | %s\n", ppd_filename, language, basename);
++		model = g_strndup (without_vendor, tmp - without_vendor);
++		if (language &&
++		    strcmp("C", language) &&
++		    (NULL != (language_position = strstr (ppd->filename, "/"))) &&
++		    strncmp ("C/", ppd->filename, 2) &&
++		    strncmp ("stp/", ppd->filename, 4)) {
++                    driver = g_strdup_printf (_("High Quality Image (GIMP-Print CUPS) (%s)"), language);
++                } else {
++                    driver = g_strdup (_("High Quality Image (GIMP-Print CUPS)"));
++                }
++
++	/* gutenprint builtin
++	 * 	<MODEL_IN_CAPS> - CUPS+Gutenprint vm.n.o'
++         * The filename may have a subdirectory--treat the subdir as a language, and set
++         * the driver string accordingly. Use the regular driver string for the "C" language. */
++	} else if (NULL != (tmp = strstr (without_vendor, " - CUPS+Gutenprint v"))) {
++		char *ppd_filename = g_strdup(ppd->filename);
++		char *basename = strrchr (ppd_filename, '/');
++		if (basename)
++			*basename++ = '\0';
++		language = strrchr (ppd_filename, '/');
++		if (language)
++			*language++ = '\0';
++		
++		//printf("FILENAME: %s | %s | %s\n", ppd_filename, language, basename);
+ 		model = g_strndup (without_vendor, tmp - without_vendor);
+-                if((NULL != (language_position = strstr (ppd->filename, "/"))) &&
+-                   strncmp ("C/", ppd->filename, 2) &&
+-                   strncmp ("stp/", ppd->filename, 4)) {
+-                    language = g_strndup (ppd->filename, language_position - ppd->filename);
+-                    driver = g_strdup_printf (_("High Quality Image (GIMP-Print) (%s)"), language);
+-                    g_free(language);
++		if (language &&
++		    strcmp("C", language) &&
++		    (NULL != (language_position = strstr (ppd->filename, "/"))) &&
++		    strncmp ("C/", ppd->filename, 2) &&
++		    strncmp ("stp/", ppd->filename, 4)) {
++                    driver = g_strdup_printf (_("High Quality Image (Gutenprint CUPS) (%s)"), language);
+                 } else {
+-                    driver = g_strdup (_("High Quality Image (GIMP-Print)"));
++                    driver = g_strdup (_("High Quality Image (Gutenprint CUPS)"));
+                 }
+ 
+ 	/* RH style entries
+@@ -365,6 +449,13 @@ ppd_extract_model_and_driver (GCupsPPD *
+ 		driver = g_strdup (_("Standard (CUPS)"));
+ 	}
+ 
++	/* Remove "Series" or "Printer" from model name */ 
++	if ((NULL != (tmp = strcasestr (model, " Series"))) ||
++	    (NULL != (tmp = strcasestr (model, " Printer"))) ||
++	    (NULL != (tmp = strcasestr (model, " (Printer)")))) {
++		*tmp = '\0';
++	}
++
+ 	/* Lets see if this is a foomatic 'recommended' driver */
+ 	if (NULL != (tmp = strstr (without_vendor, " (recommended)"))) {
+ 		strcpy (tmp, tmp+14);
+@@ -377,6 +468,7 @@ ppd_extract_model_and_driver (GCupsPPD *
+ 
+ 	if (without_vendor != ppd->nickname)
+ 		g_free (without_vendor);
++	//printf("FILENAME: %s | %s | %s\n", ppd->filename, ppd->model, ppd->driver);
+ }
+ 
+ static int

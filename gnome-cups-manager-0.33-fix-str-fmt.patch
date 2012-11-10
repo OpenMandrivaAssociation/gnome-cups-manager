@@ -1,0 +1,28 @@
+--- libgnomecups/gnome-cups-ui-driver.c.str	2010-02-16 17:43:25.000000000 +0100
++++ libgnomecups/gnome-cups-ui-driver.c	2010-02-16 17:44:16.000000000 +0100
+@@ -986,7 +986,7 @@
+ 		ppd_status_t status = ppdLastError(&line);
+ 		char *msg = g_strdup_printf ("%s at %d:'%s'",
+ 			ppdErrorString (status), line, ppd_file);
+-		err = g_error_new (1, 1, msg);
++		err = g_error_new (1, 1, "%s", msg);
+ 		g_free (msg);
+ 		goto done;
+ 	}
+@@ -996,7 +996,7 @@
+ 
+ 	stdio = fopen (target_path, "w");
+ 	if (stdio == NULL) {
+-		err = g_error_new (1, 1,
++		err = g_error_new (1, 1, "%s",
+ 			_("Unable to write to\n\t<b>%s</b>\nbecause %s"), target_path, strerror (errno));
+ 		goto done;
+ 	}
+@@ -1028,6 +1028,7 @@
+ 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+ 			GTK_MESSAGE_ERROR,
+ 			GTK_BUTTONS_OK,
++			"%s",
+ 			err->message);
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));

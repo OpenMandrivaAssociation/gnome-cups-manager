@@ -1,0 +1,16 @@
+diff -Nur gnome-cups-manager-0.31/libgnomecups/gnome-cups-ui-connection.glade gnome-cups-manager-0.31.new/libgnomecups/gnome-cups-ui-connection.glade
+--- gnome-cups-manager-0.31/libgnomecups/gnome-cups-ui-connection.glade	2005-03-03 16:26:54.000000000 +0000
++++ gnome-cups-manager-0.31.new/libgnomecups/gnome-cups-ui-connection.glade	2007-03-03 15:55:28.000000000 +0000
+@@ -108,10 +108,10 @@
+ 	      <child>
+ 		<widget class="GtkComboBox" id="connection_types">
+ 		  <property name="visible">True</property>
+-		  <property name="items" translatable="yes">CUPS Printer (IPP)
++		  <property name="items" translatable="yes">IPP Printer or printer on CUPS server (IPP)
+ Windows Printer (SMB)
+ UNIX Printer (LPD)
+-HP JetDirect</property>
++TCP/Socket, HP JetDirect, Raw connection</property>
+ 		</widget>
+ 		<packing>
+ 		  <property name="left_attach">1</property>

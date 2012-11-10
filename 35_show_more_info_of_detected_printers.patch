@@ -1,0 +1,32 @@
+diff -Nur gnome-cups-manager-0.31/libgnomecups/gnome-cups-ui-connection.c gnome-cups-manager-0.31.new/libgnomecups/gnome-cups-ui-connection.c
+--- gnome-cups-manager-0.31/libgnomecups/gnome-cups-ui-connection.c	2007-03-03 16:37:58.000000000 +0000
++++ gnome-cups-manager-0.31.new/libgnomecups/gnome-cups-ui-connection.c	2007-03-03 16:46:08.000000000 +0000
+@@ -41,6 +41,7 @@
+ 
+ #include "snmpinter.h"
+ #include <stdarg.h>
++#include <stdio.h>
+ #include <gnome-keyring.h>
+ #ifdef HAVE_LIBSMBCLIENT
+ #include <libgnomeui/gnome-password-dialog.h>
+@@ -837,12 +838,16 @@
+ 		    && strcmp (desc->vendor_and_model, "EPSON")
+ 		    && strcmp (desc->vendor_and_model, "CANON")) {
+ 			GtkTreeIter iter;
+-
++			char ListText[256];
++			if (desc->label)
++				snprintf(ListText, 255, "%s (%s)",
++					 desc->vendor_and_model, desc->label);
++			else 
++				snprintf(ListText, 255, "%s",
++					 desc->vendor_and_model);
+ 			gtk_list_store_append (list_store, &iter);
+ 			gtk_list_store_set (list_store, &iter,
+-					    0, desc->vendor_and_model,
+-					    1, desc,
+-					    -1);
++					    0, ListText, 1, desc, -1);
+ 			if (num_detected == 0)
+ 				gtk_tree_selection_select_iter (selection, &iter);
+ 			num_detected++;
