@@ -11,7 +11,7 @@ Version: 0.33
 Release: %mkrel 4
 License: GPLv2+
 Group: Graphical desktop/GNOME
-URL: http://www.ximian.com
+URL: https://www.ximian.com
 Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
 Patch1: 20_change-su-command.patch
 Patch2: 23_options.patch
