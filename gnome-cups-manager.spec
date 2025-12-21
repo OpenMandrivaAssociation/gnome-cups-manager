@@ -27,6 +27,11 @@ Patch13: desktop-potfiles.patch
 Patch17: ui_browse_share_ctl.patch
 Patch18: gnome-cups-manager-0.33-fix-str-fmt.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires: libgnomeui2-devel
 BuildRequires: libglade2.0-devel
 BuildRequires: libgnomecups-devel >= %{libgnomecups_version}
